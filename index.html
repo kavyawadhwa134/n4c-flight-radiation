@@ -61,8 +61,8 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
 .end[aria-pressed="true"]{border-color:var(--navy);background:var(--panel)}
 .arrow{font-family:var(--display);font-weight:800;font-size:2rem;color:var(--sky)}
 [dir="rtl"] .arrow{transform:scaleX(-1)}
-.search{flex:1;min-width:12rem;display:flex;gap:.6rem;justify-content:flex-end}
-.search input{width:100%;max-width:20rem;height:3.2rem;border-radius:999px;border:.12rem solid var(--line);background:var(--bg);padding:0 1.2rem;font-size:1.2rem}
+.search{flex:1;min-width:24rem;display:flex;gap:.6rem;justify-content:flex-end}
+.search select{width:100%;min-width:15rem;max-width:22rem;height:3.2rem;border-radius:999px;border:.12rem solid var(--line);background:var(--bg);padding:0 1rem;font-size:1.2rem;color:var(--fg);cursor:pointer}
 .chip{height:3.2rem;border-radius:999px;border:.12rem solid var(--sun);background:#FFF6DA;color:var(--navy-deep);font-weight:700;font-size:1.15rem;padding:0 1.1rem;white-space:nowrap}
 .mapwrap{position:relative;min-height:0;background:var(--sea)}
 #map{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -81,7 +81,7 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
 .hintbar i{width:.8rem;height:.8rem;border-radius:50%;background:var(--sky);display:inline-block;animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.6);opacity:.4}}
 .message{position:absolute;left:1rem;right:1rem;bottom:1rem;background:rgba(255,255,255,.95);border:.12rem solid var(--panel-line);border-radius:1.4rem;padding:1rem 1.4rem;display:flex;flex-direction:column;gap:.3rem;box-shadow:0 .6rem 1.8rem rgba(40,59,132,.12)}
-.message p{font-size:1.55rem;font-weight:600;line-height:1.3;color:var(--fg);text-wrap:balance}
+.message p{font-size:1.4rem;font-weight:600;line-height:1.3;color:var(--fg);text-wrap:balance}
 .message p b{color:var(--navy);font-weight:800}
 .message .punch{font-family:var(--display);font-weight:800;font-size:1.9rem;color:var(--leaf);line-height:1.15}
 :lang(ar) .message p{line-height:1.6}
@@ -159,8 +159,7 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
           <span><small data-t="to"></small><strong id="toName"></strong></span>
         </button>
         <div class="search">
-          <input id="search" list="countryList" autocomplete="off">
-          <datalist id="countryList"></datalist>
+          <select id="country" aria-label="Country"></select>
           <button class="chip" type="button" id="toAntalya"></button>
         </div>
       </div>
@@ -220,62 +219,61 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
 
   // Main airport of each country: numeric ISO id -> [alpha-2, lat, lon]
   const HUB = {"242":["FJ",-17.76,177.44],"834":["TZ",-6.88,39.2],"732":["EH",27.15,-13.22],"124":["CA",43.68,-79.63],"840":["US",40.64,-73.78],"398":["KZ",43.35,77.04],"860":["UZ",41.26,69.28],"598":["PG",-9.44,147.22],"360":["ID",-6.13,106.66],"032":["AR",-34.82,-58.54],"152":["CL",-33.39,-70.79],"180":["CD",-4.39,15.44],"706":["SO",2.01,45.3],"404":["KE",-1.32,36.93],"729":["SD",15.59,32.55],"148":["TD",12.13,15.03],"332":["HT",18.58,-72.29],"214":["DO",18.43,-69.67],"643":["RU",55.97,37.41],"044":["BS",25.04,-77.47],"238":["FK",-51.82,-58.45],"578":["NO",60.19,11.1],"304":["GL",67.01,-50.69],"626":["TL",-8.55,125.52],"710":["ZA",-26.14,28.24],"426":["LS",-29.46,27.55],"484":["MX",19.44,-99.07],"858":["UY",-34.84,-56.03],"076":["BR",-23.43,-46.47],"068":["BO",-16.51,-68.19],"604":["PE",-12.02,-77.11],"170":["CO",4.7,-74.15],"591":["PA",9.07,-79.38],"188":["CR",9.99,-84.21],"558":["NI",12.14,-86.17],"340":["HN",14.06,-87.22],"222":["SV",13.44,-89.06],"320":["GT",14.58,-90.53],"084":["BZ",17.54,-88.31],"862":["VE",10.6,-66.99],"328":["GY",6.5,-58.25],"740":["SR",5.45,-55.19],"250":["FR",49.01,2.55],"218":["EC",-0.13,-78.36],"630":["PR",18.44,-66.0],"388":["JM",17.94,-76.79],"192":["CU",22.99,-82.41],"716":["ZW",-17.93,31.09],"072":["BW",-24.56,25.92],"516":["NA",-22.48,17.47],"686":["SN",14.67,-17.07],"466":["ML",12.53,-7.95],"478":["MR",18.1,-15.95],"204":["BJ",6.36,2.38],"562":["NE",13.48,2.18],"566":["NG",6.58,3.32],"120":["CM",4.01,9.72],"768":["TG",6.17,1.25],"288":["GH",5.61,-0.17],"384":["CI",5.26,-3.93],"324":["GN",9.58,-13.61],"624":["GW",11.89,-15.65],"430":["LR",6.23,-10.36],"694":["SL",8.62,-13.2],"854":["BF",12.35,-1.51],"140":["CF",4.4,18.52],"178":["CG",-4.25,15.25],"266":["GA",0.46,9.41],"226":["GQ",3.76,8.71],"894":["ZM",-15.33,28.45],"454":["MW",-13.79,33.78],"508":["MZ",-25.92,32.57],"748":["SZ",-26.36,31.72],"024":["AO",-8.86,13.23],"108":["BI",-3.32,29.32],"376":["IL",32.01,34.89],"422":["LB",33.82,35.49],"450":["MG",-18.8,47.48],"275":["PS",31.9,35.2],"270":["GM",13.34,-16.65],"788":["TN",36.85,10.23],"012":["DZ",36.69,3.22],"400":["JO",31.72,35.99],"784":["AE",25.25,55.36],"634":["QA",25.27,51.61],"414":["KW",29.24,47.97],"368":["IQ",33.26,44.23],"512":["OM",23.59,58.28],"548":["VU",-17.7,168.32],"116":["KH",11.55,104.84],"764":["TH",13.69,100.75],"418":["LA",17.99,102.56],"104":["MM",16.91,96.13],"704":["VN",21.22,105.81],"408":["KP",39.22,125.67],"410":["KR",37.46,126.44],"496":["MN",47.65,106.82],"356":["IN",28.56,77.1],"050":["BD",23.84,90.4],"064":["BT",27.4,89.42],"524":["NP",27.7,85.36],"586":["PK",33.55,72.83],"004":["AF",34.57,69.21],"762":["TJ",38.54,68.83],"417":["KG",43.06,74.48],"795":["TM",37.99,58.36],"364":["IR",35.42,51.15],"760":["SY",33.41,36.52],"051":["AM",40.15,44.4],"752":["SE",59.65,17.92],"112":["BY",53.88,28.03],"804":["UA",50.35,30.89],"616":["PL",52.17,20.97],"040":["AT",48.11,16.57],"348":["HU",47.44,19.26],"498":["MD",46.93,28.93],"642":["RO",44.57,26.1],"440":["LT",54.63,25.29],"428":["LV",56.92,23.97],"233":["EE",59.41,24.83],"276":["DE",50.03,8.57],"100":["BG",42.7,23.41],"300":["GR",37.94,23.94],"792":["TR",41.26,28.74],"008":["AL",41.41,19.72],"191":["HR",45.74,16.07],"756":["CH",47.46,8.55],"442":["LU",49.63,6.21],"056":["BE",50.9,4.48],"528":["NL",52.31,4.76],"620":["PT",38.77,-9.13],"724":["ES",40.47,-3.56],"372":["IE",53.42,-6.27],"540":["NC",-22.01,166.21],"090":["SB",-9.43,160.05],"554":["NZ",-37.01,174.79],"036":["AU",-33.94,151.18],"144":["LK",7.18,79.88],"156":["CN",40.08,116.58],"158":["TW",25.08,121.23],"380":["IT",41.8,12.25],"208":["DK",55.62,12.65],"826":["GB",51.47,-0.45],"352":["IS",63.99,-22.62],"031":["AZ",40.47,50.05],"268":["GE",41.67,44.95],"608":["PH",14.51,121.02],"458":["MY",2.74,101.71],"096":["BN",4.94,114.93],"705":["SI",46.22,14.46],"246":["FI",60.32,24.96],"703":["SK",48.17,17.21],"203":["CZ",50.1,14.26],"232":["ER",15.29,38.91],"392":["JP",35.55,139.78],"600":["PY",-25.24,-57.52],"887":["YE",15.48,44.22],"682":["SA",24.96,46.7],"196":["CY",34.88,33.62],"504":["MA",33.37,-7.59],"818":["EG",30.12,31.41],"434":["LY",32.66,13.16],"231":["ET",8.98,38.8],"262":["DJ",11.55,43.16],"800":["UG",0.04,32.44],"646":["RW",-1.97,30.14],"070":["BA",43.82,18.33],"807":["MK",41.96,21.62],"688":["RS",44.82,20.31],"499":["ME",42.36,19.25],"780":["TT",10.6,-61.34],"728":["SS",4.87,31.6],"XK":["XK",42.57,21.04]};
-  const AUTO_TOUR = ["826","840","156","076","356","392","710","036","784","818","404","124","682","250","276","643","031","566","484","410"];
 
   // ---------- Text ----------
   const T = {
-    en: { appFlight:"Flight radiation", appLokum:"Lokum & Baklava", appQuiz:"Quiz wheel", h1:"Radiation is natural. Even on your flight.", sub:"Pick the country you flew from. See your flight's natural radiation next to everyday things.",
-      from:"Flying from", to:"Flying to", search:"Search a country", antalya:"Antalya (COP31)", hintFrom:"Click the country you flew from", hintTo:"Click the country you are flying to",
+    en: { city:"Antalya", appFlight:"Flight radiation", appLokum:"Lokum & Baklava", appQuiz:"Quiz wheel", h1:"Radiation is natural. Even on your flight.", sub:"Pick the country you flew from. See your flight's natural radiation next to everyday things.",
+      from:"Flying from", to:"Flying to", search:"Choose a country", antalya:"Antalya (COP31)", hintFrom:"Click the country you flew from", hintTo:"Click the country you are flying to",
       doseLabel:"Your flight's natural radiation", unit:"µSv", trip:(km,h)=>`${km} km · about ${h} hours`,
       why:"Up at cruising height, a little more cosmic radiation from space reaches us. It's natural and harmless.",
       banana:"bananas", bananaP:"A banana has natural potassium. Eating one gives about 0.1 µSv.",
       years:"years", plantP:"of living next to a nuclear power plant (about 0.09 µSv a year)",
       days:"days", hours:"hours", bgP:"of the natural radiation everyone gets from soil, rocks, food and space",
-      msg:(b,y)=>`Your flight gave you the same natural dose as eating <b>${b} bananas</b>, or living next to a nuclear power plant for <b>${y} years</b>.`,
+      msg:(from,to,dose,y)=>`Flying from <b>${from}</b> to ${to} has already given you <b>${dose} µSv</b> of radiation. You aren't sick. You weren't sick after your last flight either. Living next to a nuclear power plant gives you even less: it would take <b>${y} years</b> to get the same dose.`,
       punch:"Radiation is part of everyday life. Nuclear power adds almost nothing.", same:"Pick two different countries.",
       auto:"Auto play", full:"Full screen", keys:"Keyboard: P auto play · F full screen · Esc reset",
       foot:"Estimates. Cruise dose of 2 to 6 µSv per hour depending on latitude, from great-circle distance at 850 km/h. Banana: 0.1 µSv. Living within 80 km of a nuclear power plant: 0.09 µSv a year (US DOE). Natural background: 2.4 mSv a year, world average (UNSCEAR)." },
-    tr: { appFlight:"Uçuş radyasyonu", appLokum:"Lokum & Baklava", appQuiz:"Bilgi çarkı", h1:"Radyasyon doğaldır. Uçuşunda bile.", sub:"Uçtuğun ülkeyi seç. Uçuşundaki doğal radyasyonu gündelik şeylerle karşılaştır.",
-      from:"Nereden", to:"Nereye", search:"Ülke ara", antalya:"Antalya (COP31)", hintFrom:"Uçtuğun ülkeye tıkla", hintTo:"Gideceğin ülkeye tıkla",
+    tr: { city:"Antalya", appFlight:"Uçuş radyasyonu", appLokum:"Lokum & Baklava", appQuiz:"Bilgi çarkı", h1:"Radyasyon doğaldır. Uçuşunda bile.", sub:"Uçtuğun ülkeyi seç. Uçuşundaki doğal radyasyonu gündelik şeylerle karşılaştır.",
+      from:"Nereden", to:"Nereye", search:"Ülke seç", antalya:"Antalya (COP31)", hintFrom:"Uçtuğun ülkeye tıkla", hintTo:"Gideceğin ülkeye tıkla",
       doseLabel:"Uçuşundaki doğal radyasyon", unit:"µSv", trip:(km,h)=>`${km} km · yaklaşık ${h} saat`,
       why:"Uçuş yüksekliğinde uzaydan gelen biraz daha fazla kozmik ışın bize ulaşır. Bu doğaldır ve zararsızdır.",
       banana:"muz", bananaP:"Muzda doğal potasyum vardır. Bir muz yemek yaklaşık 0,1 µSv verir.",
       years:"yıl", plantP:"nükleer santralin yanında yaşamak (yılda yaklaşık 0,09 µSv)",
       days:"gün", hours:"saat", bgP:"herkesin topraktan, kayalardan, yiyeceklerden ve uzaydan aldığı doğal radyasyon",
-      msg:(b,y)=>`Bu uçuş, <b>${b} muz</b> yemek ya da <b>${y} yıl</b> nükleer santralin yanında yaşamakla aynı doğal dozu verdi.`,
+      msg:(from,to,dose,y)=>`<b>${from}</b> → ${to} uçuşun sana zaten <b>${dose} µSv</b> radyasyon verdi. Hasta değilsin. Son uçuşundan sonra da hasta olmadın. Nükleer santralin yanında yaşamak çok daha azını verir: aynı doz için <b>${y} yıl</b> gerekir.`,
       punch:"Radyasyon günlük hayatın bir parçası. Nükleer enerji neredeyse hiçbir şey eklemez.", same:"İki farklı ülke seç.",
       auto:"Otomatik oynat", full:"Tam ekran", keys:"Klavye: P otomatik oynat · F tam ekran · Esc sıfırla",
       foot:"Tahminlerdir. Seyir dozu enleme göre saatte 2–6 µSv; büyük daire mesafesi ve 850 km/sa hızla hesaplandı. Muz: 0,1 µSv. Nükleer santralin 80 km yakınında yaşamak: yılda 0,09 µSv (ABD Enerji Bakanlığı). Doğal arka plan: yılda 2,4 mSv, dünya ortalaması (UNSCEAR)." },
-    ar: { appFlight:"إشعاع الطيران", appLokum:"لوكوم وبقلاوة", appQuiz:"عجلة الأسئلة", h1:"الإشعاع طبيعي، حتى في رحلتك الجوية.", sub:"اختر البلد الذي سافرت منه، وقارن الإشعاع الطبيعي في رحلتك بأشياء من الحياة اليومية.",
-      from:"من", to:"إلى", search:"ابحث عن بلد", antalya:"أنطاليا (COP31)", hintFrom:"انقر على البلد الذي سافرت منه", hintTo:"انقر على البلد الذي تسافر إليه",
+    ar: { city:"أنطاليا", appFlight:"إشعاع الطيران", appLokum:"لوكوم وبقلاوة", appQuiz:"عجلة الأسئلة", h1:"الإشعاع طبيعي، حتى في رحلتك الجوية.", sub:"اختر البلد الذي سافرت منه، وقارن الإشعاع الطبيعي في رحلتك بأشياء من الحياة اليومية.",
+      from:"من", to:"إلى", search:"اختر بلدًا", antalya:"أنطاليا (COP31)", hintFrom:"انقر على البلد الذي سافرت منه", hintTo:"انقر على البلد الذي تسافر إليه",
       doseLabel:"الإشعاع الطبيعي في رحلتك", unit:"ميكروسيفرت", trip:(km,h)=>`${km} كم · نحو ${h} ساعة`,
       why:"على ارتفاع الطيران يصلنا قدر أكبر قليلًا من الأشعة الكونية القادمة من الفضاء. وهذا أمر طبيعي وغير ضار.",
       banana:"موزة", bananaP:"يحتوي الموز على البوتاسيوم الطبيعي. تناول موزة واحدة يعطي نحو 0.1 ميكروسيفرت.",
       years:"سنة", plantP:"من العيش بجوار محطة طاقة نووية (نحو 0.09 ميكروسيفرت سنويًا)",
       days:"يوم", hours:"ساعة", bgP:"من الإشعاع الطبيعي الذي يتلقاه الجميع من التربة والصخور والطعام والفضاء",
-      msg:(b,y)=>`منحتك هذه الرحلة الجرعة الطبيعية نفسها التي تحصل عليها من تناول <b>${b} موزة</b>، أو من العيش بجوار محطة طاقة نووية لمدة <b>${y} سنة</b>.`,
+      msg:(from,to,dose,y)=>`رحلتك من <b>${from}</b> إلى ${to} منحتك بالفعل <b>${dose} ميكروسيفرت</b> من الإشعاع. أنت لست مريضًا، ولم تمرض بعد رحلتك السابقة أيضًا. والعيش بجوار محطة طاقة نووية يمنحك أقل من ذلك: تحتاج إلى <b>${y} سنة</b> للحصول على الجرعة نفسها.`,
       punch:"الإشعاع جزء من الحياة اليومية، والطاقة النووية لا تضيف إليه شيئًا يُذكر.", same:"اختر بلدين مختلفين.",
       auto:"تشغيل تلقائي", full:"ملء الشاشة", keys:"لوحة المفاتيح: P تشغيل تلقائي · F ملء الشاشة · Esc إعادة الضبط",
       foot:"تقديرات. جرعة الطيران من 2 إلى 6 ميكروسيفرت في الساعة حسب خط العرض، محسوبة من مسافة الدائرة العظمى بسرعة 850 كم/ساعة. الموزة: 0.1 ميكروسيفرت. العيش على بعد 80 كم من محطة نووية: 0.09 ميكروسيفرت سنويًا (وزارة الطاقة الأمريكية). الخلفية الطبيعية: 2.4 ملّيسيفرت سنويًا، المتوسط العالمي (UNSCEAR)." },
-    fr: { appFlight:"Radiation en vol", appLokum:"Lokum & Baklava", appQuiz:"Roue du quiz", h1:"La radioactivité est naturelle. Même en avion.", sub:"Choisissez votre pays de départ et comparez le rayonnement naturel de votre vol au quotidien.",
-      from:"Départ", to:"Arrivée", search:"Rechercher un pays", antalya:"Antalya (COP31)", hintFrom:"Cliquez sur votre pays de départ", hintTo:"Cliquez sur votre pays d'arrivée",
+    fr: { city:"Antalya", appFlight:"Radiation en vol", appLokum:"Lokum & Baklava", appQuiz:"Roue du quiz", h1:"La radioactivité est naturelle. Même en avion.", sub:"Choisissez votre pays de départ et comparez le rayonnement naturel de votre vol au quotidien.",
+      from:"Départ", to:"Arrivée", search:"Choisir un pays", antalya:"Antalya (COP31)", hintFrom:"Cliquez sur votre pays de départ", hintTo:"Cliquez sur votre pays d'arrivée",
       doseLabel:"Rayonnement naturel de votre vol", unit:"µSv", trip:(km,h)=>`${km} km · environ ${h} h`,
       why:"En altitude, un peu plus de rayonnement cosmique venu de l'espace nous atteint. C'est naturel et sans danger.",
       banana:"bananes", bananaP:"La banane contient du potassium naturel. En manger une donne environ 0,1 µSv.",
       years:"ans", plantP:"à vivre à côté d'une centrale nucléaire (environ 0,09 µSv par an)",
       days:"jours", hours:"heures", bgP:"de la radioactivité naturelle que chacun reçoit du sol, des roches, des aliments et de l'espace",
-      msg:(b,y)=>`Votre vol vous a donné la même dose naturelle que manger <b>${b} bananes</b>, ou vivre à côté d'une centrale nucléaire pendant <b>${y} ans</b>.`,
+      msg:(from,to,dose,y)=>`Votre vol <b>${from}</b> → ${to} vous a déjà exposé à <b>${dose} µSv</b>. Vous n'êtes pas malade. Vous ne l'étiez pas non plus après votre dernier vol. Vivre à côté d'une centrale nucléaire expose encore moins : il faudrait <b>${y} ans</b> pour recevoir la même dose.`,
       punch:"La radioactivité fait partie de la vie quotidienne. Le nucléaire n'y ajoute presque rien.", same:"Choisissez deux pays différents.",
       auto:"Lecture auto", full:"Plein écran", keys:"Clavier : P lecture auto · F plein écran · Échap réinitialiser",
       foot:"Estimations. Dose en vol de 2 à 6 µSv par heure selon la latitude, calculée sur la distance orthodromique à 850 km/h. Banane : 0,1 µSv. Vivre à moins de 80 km d'une centrale nucléaire : 0,09 µSv par an (US DOE). Fond naturel : 2,4 mSv par an, moyenne mondiale (UNSCEAR)." },
-    zh: { appFlight:"飞行辐射", appLokum:"Lokum 与 Baklava", appQuiz:"知识转盘", h1:"辐射无处不在，乘飞机也一样。", sub:"选择你出发的国家，把这次航班的天然辐射和日常事物比一比。",
-      from:"出发地", to:"目的地", search:"搜索国家", antalya:"安塔利亚（COP31）", hintFrom:"点击你出发的国家", hintTo:"点击你要去的国家",
+    zh: { city:"安塔利亚", appFlight:"飞行辐射", appLokum:"Lokum 与 Baklava", appQuiz:"知识转盘", h1:"辐射无处不在，乘飞机也一样。", sub:"选择你出发的国家，把这次航班的天然辐射和日常事物比一比。",
+      from:"出发地", to:"目的地", search:"选择国家", antalya:"安塔利亚（COP31）", hintFrom:"点击你出发的国家", hintTo:"点击你要去的国家",
       doseLabel:"你这次航班的天然辐射", unit:"微希沃特", trip:(km,h)=>`${km} 公里 · 约 ${h} 小时`,
       why:"在飞行高度，来自太空的宇宙射线会稍多一些。这是自然现象，不会伤害你。",
       banana:"根香蕉", bananaP:"香蕉含有天然的钾。吃一根香蕉约为 0.1 微希沃特。",
       years:"年", plantP:"住在核电站旁边（每年约 0.09 微希沃特）",
       days:"天", hours:"小时", bgP:"每个人从土壤、岩石、食物和太空中接受的天然辐射",
-      msg:(b,y)=>`这次航班带给你的天然剂量，相当于吃 <b>${b} 根香蕉</b>，或在核电站旁边住 <b>${y} 年</b>。`,
+      msg:(from,to,dose,y)=>`从<b>${from}</b>飞到${to}，你已经接受了 <b>${dose} 微希沃特</b>的辐射。你没有生病，上次坐飞机后也没有。住在核电站旁边接受的更少：要住 <b>${y} 年</b>才相当于这次航班。`,
       punch:"辐射是日常生活的一部分。核电几乎不会增加什么。", same:"请选择两个不同的国家。",
       auto:"自动播放", full:"全屏", keys:"键盘：P 自动播放 · F 全屏 · Esc 重置",
       foot:"以上为估算。巡航剂量按纬度为每小时 2–6 微希沃特，按大圆距离和 850 公里/小时计算。香蕉：0.1 微希沃特。住在核电站 80 公里范围内：每年 0.09 微希沃特（美国能源部）。天然本底：每年 2.4 毫希沃特，世界平均（UNSCEAR）。" }
@@ -391,6 +389,8 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
     $("endFrom").setAttribute("aria-pressed", picking === "from");
     $("endTo").setAttribute("aria-pressed", picking === "to");
     $("hint").textContent = picking === "from" ? t.hintFrom : t.hintTo;
+    const cur = picking === "from" ? fromId : (toId === "AYT" ? "792" : toId);
+    if ($("country").value !== cur) $("country").value = HUB[cur] ? cur : "";
     let a = point(fromId), b = point(toId);
     if (fromId === "792" && toId === "AYT") { /* Istanbul -> Antalya, fine */ }
     if (fromId === toId) { $("msg").textContent = t.same; paintRoute(false); return; }
@@ -402,7 +402,7 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
     $("vBanana").innerHTML = `${fmt(bananas)}<span>${t.banana}</span>`;
     $("vPlant").innerHTML = `${fmt(Math.round(years))}<span>${t.years}</span>`;
     $("vBg").innerHTML = days < 1 ? `${fmt(days * 24, days * 24 < 10 ? 1 : 0)}<span>${t.hours}</span>` : `${fmt(days, 1)}<span>${t.days}</span>`;
-    $("msg").innerHTML = t.msg(fmt(bananas), fmt(Math.round(years)));
+    $("msg").innerHTML = t.msg(nameOf(fromId), toId === "AYT" ? t.city : nameOf(toId), fmt(r.dose, doseD), fmt(Math.round(years)));
     paintRoute(animate);
   }
 
@@ -419,10 +419,11 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
     try { regionNames = new Intl.DisplayNames([lang === "zh" ? "zh-Hans" : lang], { type: "region" }); } catch (e) { regionNames = null; }
     document.querySelectorAll("[data-t]").forEach(el => { const v = t[el.dataset.t]; if (typeof v === "string") el.textContent = v; });
     document.querySelectorAll(".langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
-    $("search").placeholder = t.search;
+
     $("toAntalya").textContent = "✈ " + t.antalya;
     const names = Object.keys(HUB).map(id => [id, nameOf(id)]).sort((x, y) => x[1].localeCompare(y[1], locale()));
-    $("countryList").innerHTML = names.map(([id, n]) => `<option value="${n.replace(/"/g, "&quot;")}"></option>`).join("");
+    const esc = x => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    $("country").innerHTML = `<option value="" disabled>${esc(t.search)}</option>` + names.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
     render(false);
   }
 
@@ -430,11 +431,7 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
   $("endFrom").addEventListener("click", () => { picking = "from"; render(false); });
   $("endTo").addEventListener("click", () => { picking = "to"; render(false); });
   $("toAntalya").addEventListener("click", () => { stopAuto(); toId = "AYT"; picking = "from"; render(true); });
-  $("search").addEventListener("change", e => {
-    const q = e.target.value.trim().toLocaleLowerCase(locale());
-    const hit = Object.keys(HUB).find(id => nameOf(id).toLocaleLowerCase(locale()) === q) || Object.keys(HUB).find(id => nameOf(id).toLocaleLowerCase(locale()).startsWith(q));
-    if (hit) { stopAuto(); choose(hit); e.target.value = ""; e.target.blur(); }
-  });
+  $("country").addEventListener("change", e => { if (HUB[e.target.value]) { stopAuto(); choose(e.target.value); } });
   document.querySelectorAll(".langs button").forEach(b => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("n4c-flight-lang", lang); applyText(); }));
 
   document.querySelectorAll("[data-app]").forEach(a => a.addEventListener("click", () => {
@@ -447,13 +444,23 @@ button:focus-visible,input:focus-visible{outline:.25rem solid var(--sky);outline
   const toggleFull = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {} };
   $("full").addEventListener("click", toggleFull);
 
-  let timer = null, tourAt = 0;
-  function startAuto() { $("auto").setAttribute("aria-pressed", "true"); toId = "AYT"; picking = "from"; const go = () => { fromId = AUTO_TOUR[tourAt++ % AUTO_TOUR.length]; render(true); }; go(); timer = setInterval(go, 7000); }
+  let timer = null;
+  function startAuto() {
+    $("auto").setAttribute("aria-pressed", "true");
+    toId = "AYT"; picking = "from";
+    render(true);                      // first: the country already selected, to Antalya
+    const ids = Object.keys(HUB).filter(id => id !== "792");
+    const go = () => {                 // then: a random country each time, never the same twice in a row
+      let next; do { next = ids[Math.floor(Math.random() * ids.length)]; } while (next === fromId);
+      fromId = next; render(true);
+    };
+    timer = setInterval(go, 7000);
+  }
   function stopAuto() { if (timer) { clearInterval(timer); timer = null; } $("auto").setAttribute("aria-pressed", "false"); }
   $("auto").addEventListener("click", () => timer ? stopAuto() : startAuto());
 
   document.addEventListener("keydown", e => {
-    if (e.target.tagName === "INPUT" || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key.toLowerCase();
     if (k === "p") timer ? stopAuto() : startAuto();
     else if (k === "f") toggleFull();
